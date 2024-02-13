@@ -7,15 +7,26 @@ int main(){
 
     InitWindow(windowWidth,windowHeight,"Dasher");
     //gravity
-    const int gravity = 1;
-    const int jump = (-22);
+    const int gravity = 1000;
+    const int jump = (-600);
     bool isInAir;
 
-    //Rect
-    const int width = 50;
-    const int height = 80;
+    Texture2D scarfy = LoadTexture("textures/scarfy.png");
+    Rectangle scarfyRec;
+    scarfyRec.width = scarfy.width/6;
+    scarfyRec.height = scarfy.height;
+    scarfyRec.x = 0;
+    scarfyRec.y = 0;
+    Vector2 scarfyPos;
+    scarfyPos.x = windowWidth/2 - scarfyRec.width/2;
+    scarfyPos.y = windowHeight/2 - scarfyRec.height;
 
-    int posY = windowHeight - height;
+    //frame count for animation
+    int frame = 0;
+    const float updateTime = 1.0/12.0;
+    float runningTime;
+
+
     int velocity = 0;
 
     SetTargetFPS(60);
@@ -23,14 +34,18 @@ int main(){
 
          BeginDrawing();
          ClearBackground(WHITE);
+
+        //delta time 
+         float dT = GetFrameTime();
+         
             
             //ground check
-            if(posY >= windowHeight-height){
+            if(scarfyPos.y >= windowHeight-scarfyRec.height){
                 velocity = 0;
                 isInAir = false;
             }else{
                  //apply gravity
-            velocity+=gravity;
+            velocity+=gravity*dT;
             isInAir = true;
             } 
 
@@ -39,10 +54,24 @@ int main(){
                }
 
             //jump position
-            posY+=velocity;
-            DrawRectangle(windowWidth/2,posY,width,height,BLUE);
+            scarfyPos.y+=velocity*dT;
+
+            //update scarfy animation frame by frame
+            runningTime+=dT;
+            if(runningTime>=updateTime){
+                runningTime = 0.0;
+                scarfyRec.x = frame*scarfyRec.width;
+                frame++;
+                if(frame>5){
+                    frame = 0;
+                }
+            }
+
+            
+            DrawTextureRec(scarfy,scarfyRec,scarfyPos,WHITE);
 
          EndDrawing();
     }
+    UnloadTexture(scarfy);
     CloseWindow();
 }
